@@ -1,0 +1,2176 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Micro-Drama Screenwriting Mastery Engine</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#f5f3ff',
+              100: '#ede9fe',
+              500: '#8b5cf6',
+              600: '#7c3aed',
+              700: '#6d28d9',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #090d16;
+      color: #e2e8f0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 9999px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+    @keyframes pulseSuccess {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.03); }
+      100% { transform: scale(1); }
+    }
+    .animate-pulse-success {
+      animation: pulseSuccess 0.25s ease-in-out;
+    }
+    /* Mobile-optimized focus mode transitions */
+    .header-collapsible {
+      transition: max-height 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease-in-out;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col custom-scrollbar selection:bg-brand-600 selection:text-white">
+
+  <header class="sticky top-0 z-40 bg-[#0c1222]/95 backdrop-blur-md border-b border-slate-800">
+    <!-- Slim Focus Micro-Bar (Active when header is collapsed on mobile) -->
+    <div id="focusMicroBar" class="hidden max-w-6xl mx-auto px-3 py-1.5 flex items-center justify-between text-xs bg-slate-900/90 border-b border-slate-800/60">
+      <div class="flex items-center gap-2">
+        <span class="w-6 h-6 rounded-lg bg-gradient-to-tr from-brand-600 to-indigo-500 flex items-center justify-center text-white font-bold text-xs shadow-sm">μ</span>
+        <span id="microCardProgress" class="font-mono text-[11px] text-slate-300 font-semibold">Card 1 of 35</span>
+        <span id="microModeBadge" class="text-[10px] px-1.5 py-0.5 rounded bg-brand-500/20 text-brand-300 font-medium font-mono hidden xs:inline">Practice</span>
+      </div>
+      <div class="flex items-center gap-1.5">
+        <button onclick="toggleSound()" class="p-1 rounded bg-slate-800 text-xs" title="Toggle Sound">
+          <span id="microSoundIcon">🔊</span>
+        </button>
+        <button onclick="openOmittedModal()" class="px-2 py-0.5 rounded bg-slate-800 text-rose-400 font-mono text-[11px] border border-slate-700/60 flex items-center gap-1">
+          <span>🚫</span> <span id="microOmittedBadge">0</span>
+        </button>
+        <button onclick="openStatsModal()" class="px-2 py-0.5 rounded bg-slate-800 text-emerald-400 font-mono text-[11px] border border-slate-700/60 flex items-center gap-1">
+          <span>📊</span> <span id="microAccuracyBadge">100%</span>
+        </button>
+        <button onclick="toggleFocusMode()" class="ml-1 px-2 py-0.5 rounded-lg bg-brand-600/30 hover:bg-brand-600 text-brand-200 hover:text-white text-xs font-semibold border border-brand-500/40 flex items-center gap-1 transition">
+          <span>Expand ▾</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Branding Bar -->
+    <div id="headerMainBar" class="header-collapsible max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center space-x-3">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-brand-500/20 text-white font-extrabold text-lg">
+          μ
+        </div>
+        <div>
+          <h1 class="text-base sm:text-lg font-bold tracking-tight text-white flex items-center gap-2">
+            Micro-Drama Mastery
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-brand-500/20 text-brand-400 border border-brand-500/30 uppercase tracking-widest font-mono">Primer V4</span>
+          </h1>
+          <p class="text-xs text-slate-400 hidden sm:block">Vertical Screenwriting Rote-Recall & Diagnostic Engine</p>
+        </div>
+      </div>
+
+      <!-- Action buttons & Mode Switcher -->
+      <div class="flex items-center flex-wrap gap-2">
+        <button id="focusToggleBtn" onclick="toggleFocusMode()" class="px-2.5 py-1.5 rounded-lg bg-brand-600/20 hover:bg-brand-600/30 text-brand-300 transition text-xs sm:text-sm font-semibold flex items-center gap-1.5 border border-brand-500/30" title="Collapse header to maximize screen space">
+          <span>📱</span>
+          <span>Focus Mode</span>
+        </button>
+
+        <button id="soundToggleBtn" onclick="toggleSound()" class="p-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 transition text-sm flex items-center gap-1.5" title="Toggle Sound Feedback">
+          <span id="soundIcon">🔊</span>
+        </button>
+
+        <button id="omittedDrawerBtn" onclick="openOmittedModal()" class="px-2.5 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 transition text-xs sm:text-sm font-medium flex items-center gap-1.5 border border-slate-700/60">
+          <span>🚫</span>
+          <span>Omitted</span>
+          <span id="omittedCountBadge" class="bg-rose-500/20 text-rose-400 text-xs px-1.5 py-0.2 rounded-full font-mono">0</span>
+        </button>
+
+        <button id="statsModalBtn" onclick="openStatsModal()" class="px-2.5 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 transition text-xs sm:text-sm font-medium flex items-center gap-1.5 border border-slate-700/60">
+          <span>📊</span>
+          <span>Stats</span>
+          <span id="accuracyBadge" class="bg-emerald-500/20 text-emerald-400 text-xs px-1.5 py-0.2 rounded-full font-mono">100%</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Primary Study Modes Bar -->
+    <div id="headerModeBar" class="header-collapsible border-t border-slate-800/60 bg-slate-900/50 px-4 py-2">
+      <div class="max-w-6xl mx-auto flex items-center justify-between overflow-x-auto custom-scrollbar gap-2">
+        <div class="flex items-center space-x-1.5 sm:space-x-2 text-xs sm:text-sm font-medium">
+          <button onclick="setStudyMode('practice')" id="modeTab-practice" class="px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 bg-brand-600 text-white shadow-sm shadow-brand-500/30">
+            <span>⚡</span>
+            <span>Active Practice</span>
+          </button>
+          <button onclick="setStudyMode('exam')" id="modeTab-exam" class="px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800">
+            <span>🎯</span>
+            <span>Mastery Exam</span>
+          </button>
+          <button onclick="setStudyMode('review')" id="modeTab-review" class="px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800 relative">
+            <span>🔁</span>
+            <span>Smart Review</span>
+            <span id="reviewQueueCount" class="hidden ml-1 px-1.5 py-0.2 text-[10px] rounded-full bg-amber-500/20 text-amber-300 font-mono">0</span>
+          </button>
+          <button onclick="setStudyMode('primer')" id="modeTab-primer" class="px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800">
+            <span>📖</span>
+            <span>Learn & Primer</span>
+          </button>
+        </div>
+
+        <button onclick="shuffleDeck()" class="text-xs text-slate-400 hover:text-brand-400 flex items-center gap-1 px-2 py-1 rounded bg-slate-800/40 hover:bg-slate-800 transition">
+          <span>🔀</span>
+          <span class="hidden md:inline">Shuffle Queue</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Category Filter Bar (Visible in Practice & Exam modes) -->
+  <section id="categoryFilterBar" class="header-collapsible bg-[#0b101d] border-b border-slate-800/80 px-4 py-2 text-xs">
+    <div class="max-w-6xl mx-auto flex items-center gap-2 overflow-x-auto custom-scrollbar py-0.5">
+      <span class="text-slate-400 font-semibold uppercase tracking-wider text-[10px] whitespace-nowrap">Filter:</span>
+      <button onclick="filterCategory('all')" id="catBtn-all" class="px-2.5 py-1 rounded-full whitespace-nowrap bg-indigo-600/30 border border-indigo-500/50 text-indigo-300 font-medium">All Topics (Full Deck)</button>
+      <button onclick="filterCategory('sequence')" id="catBtn-sequence" class="px-2.5 py-1 rounded-full whitespace-nowrap bg-slate-800/80 hover:bg-slate-800 text-slate-400 hover:text-slate-200 border border-slate-700/60 font-medium">Sequential Chains</button>
+      <button onclick="filterCategory('list')" id="catBtn-list" class="px-2.5 py-1 rounded-full whitespace-nowrap bg-slate-800/80 hover:bg-slate-800 text-slate-400 hover:text-slate-200 border border-slate-700/60 font-medium">Verbatim Lists</button>
+      <button onclick="filterCategory('diagnostic')" id="catBtn-diagnostic" class="px-2.5 py-1 rounded-full whitespace-nowrap bg-slate-800/80 hover:bg-slate-800 text-slate-400 hover:text-slate-200 border border-slate-700/60 font-medium">Craft Diagnostics</button>
+      <button onclick="filterCategory('production')" id="catBtn-production" class="px-2.5 py-1 rounded-full whitespace-nowrap bg-slate-800/80 hover:bg-slate-800 text-slate-400 hover:text-slate-200 border border-slate-700/60 font-medium">Production & Ceilings</button>
+      <button onclick="filterCategory('metrics')" id="catBtn-metrics" class="px-2.5 py-1 rounded-full whitespace-nowrap bg-slate-800/80 hover:bg-slate-800 text-slate-400 hover:text-slate-200 border border-slate-700/60 font-medium">Platform & Metrics</button>
+    </div>
+  </section>
+
+  <!-- Main Active Study Area -->
+  <main class="flex-1 max-w-4xl w-full mx-auto p-3 sm:p-6 flex flex-col justify-start">
+    
+    <!-- Progress Indicator -->
+    <div id="sessionProgressContainer" class="mb-3 sm:mb-4">
+      <div class="flex items-center justify-between text-xs text-slate-400 mb-1.5 font-mono">
+        <span id="deckProgressLabel">Card 1 of 35</span>
+        <span id="deckPercentageLabel">0% Complete</span>
+      </div>
+      <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+        <div id="deckProgressBar" class="h-full bg-gradient-to-r from-brand-600 to-indigo-500 w-0 transition-all duration-300"></div>
+      </div>
+    </div>
+
+    <!-- Active Card Display Viewport -->
+    <div id="cardViewport" class="flex-1 flex flex-col">
+      <!-- Injected Dynamically by JavaScript -->
+    </div>
+
+    <!-- Primer Reference Viewport (Visible in Learn & Primer Mode) -->
+    <div id="primerViewport" class="hidden flex-1 flex flex-col space-y-6">
+      <!-- Injected Dynamically by JavaScript -->
+    </div>
+
+    <!-- Empty State Viewport (When all questions are omitted or complete) -->
+    <div id="emptyStateViewport" class="hidden flex-1 flex flex-col items-center justify-center text-center p-8 bg-slate-900/60 rounded-2xl border border-slate-800">
+      <div class="w-16 h-16 rounded-full bg-slate-800 flex items-center justify-center text-3xl mb-4">🎉</div>
+      <h3 class="text-xl font-bold text-white mb-2">Deck Fully Completed or Omitted!</h3>
+      <p class="text-slate-400 text-sm max-w-md mb-6">You've cleared through all available questions in this category, or remaining items are omitted.</p>
+      <div class="flex flex-wrap gap-3 justify-center">
+        <button onclick="resetCategoryProgress()" class="px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-medium text-sm transition shadow-lg shadow-brand-500/20">Restart Category</button>
+        <button onclick="restoreAllOmitted()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium text-sm transition border border-slate-700">Restore All Omitted Items</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Primer Peek Drawer / Modal -->
+  <div id="primerModal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 hidden transition-opacity">
+    <div class="bg-slate-900 border border-slate-800 w-full sm:max-w-2xl sm:rounded-2xl rounded-t-2xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in">
+      <div class="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-900/80">
+        <div class="flex items-center space-x-2">
+          <span class="text-brand-400 text-lg">📖</span>
+          <h3 id="primerModalTitle" class="text-sm sm:text-base font-bold text-white">Primer Reference</h3>
+        </div>
+        <button onclick="closePrimerModal()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800">
+          ✕
+        </button>
+      </div>
+      <div id="primerModalContent" class="p-5 overflow-y-auto custom-scrollbar text-sm text-slate-300 space-y-4 font-normal leading-relaxed">
+        <!-- Content inserted dynamically -->
+      </div>
+      <div class="p-3 border-t border-slate-800 bg-slate-950/60 flex justify-end">
+        <button onclick="closePrimerModal()" class="px-4 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold">Got it (Esc)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Omitted Questions Management Drawer -->
+  <div id="omittedModal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-slate-800 w-full max-w-xl rounded-2xl max-h-[80vh] flex flex-col shadow-2xl overflow-hidden">
+      <div class="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-900/90">
+        <div>
+          <h3 class="text-base font-bold text-white flex items-center gap-2">
+            <span>🚫</span> Omitted Questions Management
+          </h3>
+          <p class="text-xs text-slate-400">Restore questions back into the active deck anytime.</p>
+        </div>
+        <button onclick="closeOmittedModal()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800">✕</button>
+      </div>
+
+      <div id="omittedItemsList" class="p-4 overflow-y-auto custom-scrollbar flex-1 space-y-2">
+        <!-- Injected dynamically -->
+      </div>
+
+      <div class="p-4 border-t border-slate-800 bg-slate-950/60 flex justify-between items-center">
+        <button onclick="restoreAllOmitted()" class="px-3 py-1.5 rounded-lg bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 text-xs font-medium transition">
+          Restore All Questions
+        </button>
+        <button onclick="closeOmittedModal()" class="px-4 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Session Statistics Modal -->
+  <div id="statsModal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-5 shadow-2xl">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <span>📊</span> Recall Performance
+        </h3>
+        <button onclick="closeStatsModal()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800">✕</button>
+      </div>
+      
+      <div class="grid grid-cols-2 gap-3 mb-5">
+        <div class="p-3 bg-slate-800/50 rounded-xl border border-slate-700/50">
+          <div class="text-[11px] text-slate-400 uppercase tracking-wider font-semibold">Total Audited</div>
+          <div id="statTotalAnswered" class="text-2xl font-bold text-white font-mono mt-1">0</div>
+        </div>
+        <div class="p-3 bg-slate-800/50 rounded-xl border border-slate-700/50">
+          <div class="text-[11px] text-slate-400 uppercase tracking-wider font-semibold">Mastery Rate</div>
+          <div id="statMasteryRate" class="text-2xl font-bold text-emerald-400 font-mono mt-1">100%</div>
+        </div>
+        <div class="p-3 bg-slate-800/50 rounded-xl border border-slate-700/50">
+          <div class="text-[11px] text-slate-400 uppercase tracking-wider font-semibold">Smart Review Queue</div>
+          <div id="statReviewCount" class="text-2xl font-bold text-amber-400 font-mono mt-1">0</div>
+        </div>
+        <div class="p-3 bg-slate-800/50 rounded-xl border border-slate-700/50">
+          <div class="text-[11px] text-slate-400 uppercase tracking-wider font-semibold">Omitted Items</div>
+          <div id="statOmittedCount" class="text-2xl font-bold text-rose-400 font-mono mt-1">0</div>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2">
+        <button onclick="resetAllStats()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium">Reset Stats</button>
+        <button onclick="closeStatsModal()" class="px-4 py-1.5 rounded-lg bg-brand-600 hover:bg-brand-500 text-white text-xs font-medium">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* Web Audio Feedback Synthesizer (No external dependencies) */
+    let audioCtx = null;
+    let soundEnabled = true;
+
+    function getAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    function toggleSound() {
+      soundEnabled = !soundEnabled;
+      document.getElementById('soundIcon').innerText = soundEnabled ? '🔊' : '🔇';
+      const microSoundIcon = document.getElementById('microSoundIcon');
+      if (microSoundIcon) microSoundIcon.innerText = soundEnabled ? '🔊' : '🔇';
+      saveState();
+    }
+
+    function playSound(type) {
+      if (!soundEnabled) return;
+      try {
+        const ctx = getAudioContext();
+        const now = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        if (type === 'match') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(587.33, now); // D5
+          osc.frequency.exponentialRampToValueAtTime(880, now + 0.12); // A5
+          gain.gain.setValueAtTime(0.12, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+          osc.start(now);
+          osc.stop(now + 0.12);
+        } else if (type === 'success') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(523.25, now); // C5
+          osc.frequency.setValueAtTime(659.25, now + 0.08); // E5
+          osc.frequency.setValueAtTime(783.99, now + 0.16); // G5
+          gain.gain.setValueAtTime(0.15, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+          osc.start(now);
+          osc.stop(now + 0.35);
+        } else if (type === 'error') {
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(220, now);
+          osc.frequency.linearRampToValueAtTime(164.81, now + 0.15);
+          gain.gain.setValueAtTime(0.12, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+          osc.start(now);
+          osc.stop(now + 0.15);
+        } else if (type === 'click') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(400, now);
+          gain.gain.setValueAtTime(0.05, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+          osc.start(now);
+          osc.stop(now + 0.04);
+        }
+      } catch (e) {
+        // AudioContext autoplay restrictions or error fallback
+      }
+    }
+
+    const MASTER_QUESTIONS = [
+      // ================= SEQUENTIAL CHAINS =================
+      {
+        id: "seq_betrayal_arc",
+        category: "sequence",
+        categoryLabel: "Sequential Chains",
+        title: "The 5-Beat Betrayal Arc",
+        prompt: "What is the exact 5-step single-scene emotional fluctuation sequence in a confrontation?",
+        explanation: "Rather than moving locations, a 60-second micro-drama confrontation moves through five distinct emotional beats.",
+        items: [
+          "Discovery",
+          "Disbelief",
+          "Humiliation",
+          "Anger",
+          "Desire to retaliate"
+        ],
+        primerExcerpt: `<strong>The 5-Beat Betrayal Arc (Single-Scene Fluctuation):</strong><br>
+        Rather than changing locations, a 60-second confrontation moves through five distinct emotional states:<br>
+        1. <strong>Discovery</strong><br>
+        2. <strong>Disbelief</strong><br>
+        3. <strong>Humiliation</strong><br>
+        4. <strong>Anger</strong><br>
+        5. <strong>Desire to retaliate</strong><br><br>
+        <em>Key Rule:</em> Pacing does not mean frantically changing plot locations. Maintain emotional fluctuation in a single room!`
+      },
+      {
+        id: "seq_core_loop",
+        category: "sequence",
+        categoryLabel: "Sequential Chains",
+        title: "The Core Loop Cycle",
+        prompt: "What is the repeatable 4-step sequence that powers the series retention engine (repeating every 8–10 episodes)?",
+        explanation: "A standard 50-70 episode series contains 4 to 6 full loops that escalate stakes along the emotional staircase.",
+        items: [
+          "Problem / Crisis",
+          "Escalation",
+          "Partial Payoff / False Resolution",
+          "Bigger Complication"
+        ],
+        primerExcerpt: `<strong>The Core Loop Cycle:</strong><br>
+        Problem / Crisis → Escalation → Partial Payoff / False Resolution → Bigger Complication.<br><br>
+        A loop delivers an immediate but incomplete payoff, and then repeats, building towards something bigger each time (the upward emotional staircase).`
+      },
+      {
+        id: "seq_loop_emotional_cycle",
+        category: "sequence",
+        categoryLabel: "Sequential Chains",
+        title: "The Emotional Cycle Within the Loop",
+        prompt: "What is the 4-part emotional cycle experienced by the audience inside every core loop?",
+        explanation: "This emotional rhythm keeps the audience yearning without granting premature full resolution.",
+        items: [
+          "Anticipation",
+          "Near fulfillment",
+          "Interruption",
+          "Renewed desire"
+        ],
+        primerExcerpt: `<strong>The Emotional Cycle Within the Loop:</strong><br>
+        1. <strong>Anticipation</strong><br>
+        2. <strong>Near fulfillment</strong><br>
+        3. <strong>Interruption</strong><br>
+        4. <strong>Renewed desire</strong><br><br>
+        This sequence gives the audience a small taste of the ultimate wish fulfillment without resolving it too early.`
+      },
+      {
+        id: "seq_launch_sequence",
+        category: "sequence",
+        categoryLabel: "Sequential Chains",
+        title: "The Structural Launch Sequence (Episodes 1–3)",
+        prompt: "What are the specific functional objectives of Episodes 1, 2, and 3 as a movie trailer launch block?",
+        explanation: "By the end of Episode 3, viewers must understand the macro engine that will fuel the next 50+ episodes.",
+        items: [
+          "Orientation (Lead introduced under pressure; immediate crisis)",
+          "Escalation (Intensify primary emotion; tighten the trap)",
+          "Series Engine Reveal (Unpack macro promise: revenge, secret identity, contract marriage)"
+        ],
+        primerExcerpt: `<strong>Episodes 1–3 Launch Sequence:</strong><br>
+        • <strong>Episode 1 (Orientation):</strong> First 3 seconds crisis, lead introduced under severe pressure, antagonist explicit.<br>
+        • <strong>Episode 2 (Escalation):</strong> Intensifies the primary emotion, tightens the trap around protagonist.<br>
+        • <strong>Episode 3 (Series Engine Reveal):</strong> Unpacks the macro-promise (revenge, contract marriage, hidden power).`
+      },
+      {
+        id: "seq_ep1_questions",
+        category: "sequence",
+        categoryLabel: "Sequential Chains",
+        title: "The 5 Questions Episode 1 MUST Answer",
+        prompt: "What 5 specific questions must Episode 1 answer clearly for the viewer?",
+        explanation: "If Episode 1 fails to answer these five questions in sequence, the script must be simplified and sharpened.",
+        items: [
+          "Who is the story about?",
+          "Who is hurting them?",
+          "What is blocking them?",
+          "Where is the story going?",
+          "Why do I need to watch next episode right now?"
+        ],
+        primerExcerpt: `<strong>The 5 Questions Episode 1 MUST Answer:</strong><br>
+        1. Who is the story about?<br>
+        2. Who is hurting them?<br>
+        3. What is blocking them?<br>
+        4. Where is the story going?<br>
+        5. Why do I need to watch the next episode right now?`
+      },
+      {
+        id: "seq_episode_anatomy",
+        category: "sequence",
+        categoryLabel: "Sequential Chains",
+        title: "Single-Episode Anatomy (Mini-Engine)",
+        prompt: "What are the 5 sequential structural beats that comprise every autonomous 1-to-2 page micro-drama episode?",
+        explanation: "Every episode functions simultaneously as a single scene, an act break, and a standalone trailer moment.",
+        items: [
+          "Hook",
+          "Premise / Escalation",
+          "Development",
+          "Conflict",
+          "Cliffhanger"
+        ],
+        primerExcerpt: `<strong>Single-Episode Anatomy:</strong><br>
+        <strong>Hook → Premise / Escalation → Development → Conflict → Cliffhanger</strong>.<br><br>
+        Every episode needs at least one meaningful turn. If power does not shift, secrets do not leak, or danger does not spike, cut the episode.`
+      },
+      {
+        id: "seq_pre_paywall_pieces",
+        category: "sequence",
+        categoryLabel: "Sequential Chains",
+        title: "Pre-Paywall Architecture (5 Puzzle Pieces)",
+        prompt: "What are the 5 essential narrative puzzle pieces that must be assembled across Episodes 1–12 before the paywall?",
+        explanation: "Once all five pieces are in place, the paywall is triggered on a massive cliffhanger or romantic turning point.",
+        items: [
+          "Character Dynamic & Immediate Friction",
+          "Prize / Stakes (What they are fighting for)",
+          "Past Trauma / Grudge (Why they are at odds)",
+          "Forced Proximity Mechanism",
+          "Deeper Personal Vulnerability"
+        ],
+        primerExcerpt: `<strong>Pre-Paywall Architecture (Rachel Zilberg Framework):</strong><br>
+        1. Character Dynamic & Immediate Friction<br>
+        2. What They Are Fighting For (The Prize/Stakes)<br>
+        3. Why They Are at Odds (Past Trauma / Grudge)<br>
+        4. Forced Proximity Mechanism<br>
+        5. Deeper Personal Vulnerability`
+      },
+
+      // ================= VERBATIM LISTS =================
+      {
+        id: "list_10_emotions",
+        category: "list",
+        categoryLabel: "Verbatim Lists",
+        title: "The 10 Primary Emotional Units",
+        prompt: "Name the 10 core emotional frequencies that vertical micro-dramas cycle through:",
+        explanation: "Emotion is the primary currency of vertical screenwriting; an episode can stay in one room as long as emotional frequency fluctuates.",
+        items: [
+          "Humiliation",
+          "Desire",
+          "Betrayal",
+          "Jealousy",
+          "Fear",
+          "Reversal",
+          "Recognition",
+          "Power shift",
+          "Romantic tension",
+          "Secret getting exposed"
+        ],
+        keywords: [
+          ["humil"],
+          ["desir", "want"],
+          ["betray"],
+          ["jealous", "envy"],
+          ["fear", "scare", "terror"],
+          ["revers"],
+          ["recogni"],
+          ["power", "shift"],
+          ["roman", "tension"],
+          ["secret", "expos"]
+        ],
+        primerExcerpt: `<strong>The 10 Primary Emotional Units (Verbatim):</strong><br>
+        1. Humiliation<br>2. Desire<br>3. Betrayal<br>4. Jealousy<br>5. Fear<br>
+        6. Reversal<br>7. Recognition<br>8. Power shift<br>9. Romantic tension<br>10. Secret getting exposed`
+      },
+      {
+        id: "list_5_physical_conflict",
+        category: "list",
+        categoryLabel: "Verbatim Lists",
+        title: "The 5 Manifestations of Conflict",
+        prompt: "What are the 5 physical or visual manifestations of vertical conflict that make pressure instantly readable?",
+        explanation: "Conflict on a mobile phone must be visibly or physically manifest so scrolling viewers grasp stakes in seconds.",
+        items: [
+          "Cornered",
+          "Exposed",
+          "Threatened",
+          "Humiliated",
+          "Forced to make a decision they don't want to make"
+        ],
+        keywords: [
+          ["corner"],
+          ["expos"],
+          ["threat"],
+          ["humil"],
+          ["forced", "decis", "unwant"]
+        ],
+        primerExcerpt: `<strong>The 5 Physical/Visual Manifestations of Conflict:</strong><br>
+        • Cornered (physically or socially trapped with nowhere to escape)<br>
+        • Exposed (secret identity, document, test caught in the open)<br>
+        • Threatened (direct physical, financial, or legal ultimatum)<br>
+        • Humiliated (publicly mocked or stripped of status)<br>
+        • Forced to make a decision they don't want to make (agonizing dilemma)`
+      },
+      {
+        id: "list_5_conflict_drivers",
+        category: "list",
+        categoryLabel: "Verbatim Lists",
+        title: "The 5 Immediate Conflict Drivers",
+        prompt: "What 5 specific catalysts launch a micro-drama story without slow exposition?",
+        explanation: "Micro-drama opening scenes cannot afford gradual backstory; they must detonate with one of these drivers.",
+        items: [
+          "A confrontation",
+          "A discovery",
+          "A threat",
+          "A decision",
+          "A reversal"
+        ],
+        keywords: [
+          ["confront"],
+          ["discov"],
+          ["threat"],
+          ["decis"],
+          ["revers"]
+        ],
+        primerExcerpt: `<strong>The Five Immediate Conflict Drivers:</strong><br>
+        1. A confrontation<br>
+        2. A discovery<br>
+        3. A threat<br>
+        4. A decision<br>
+        5. A reversal`
+      },
+      {
+        id: "list_ep1_priorities",
+        category: "list",
+        categoryLabel: "Verbatim Lists",
+        title: "The 3 Immediate Priorities for Episode 1",
+        prompt: "What are the three essential audience connection goals that Episode 1 must achieve?",
+        explanation: "Think of Episode 1 less as the first 10 pages of a script, and more as the high-voltage opening of a movie trailer.",
+        items: [
+          "Connect with protagonist immediately",
+          "Understand the crisis they are facing",
+          "Care enough about their emotional journey to watch next episode"
+        ],
+        keywords: [
+          ["connect", "protag", "lead"],
+          ["understand", "crisis"],
+          ["care", "journey", "next"]
+        ],
+        primerExcerpt: `<strong>The 3 Immediate Priorities for Episode 1:</strong><br>
+        1. Connect with the protagonist immediately.<br>
+        2. Understand the crisis they are facing.<br>
+        3. Care enough about their emotional journey to watch the next episode.`
+      },
+      {
+        id: "list_ep1_deliverables",
+        category: "list",
+        categoryLabel: "Verbatim Lists",
+        title: "The 3 Minimum Episode 1 Deliverables",
+        prompt: "What three non-negotiable narrative elements must be delivered before Episode 1 cuts to black?",
+        explanation: "Clarity itself is part of the hook in vertical mobile storytelling.",
+        items: [
+          "Identify the lead instantly",
+          "Establish source of conflict and antagonist",
+          "Set trajectory and hook the exit"
+        ],
+        keywords: [
+          ["identif", "lead"],
+          ["antagon", "conflict", "source"],
+          ["traject", "hook", "exit"]
+        ],
+        primerExcerpt: `<strong>The 3 Minimum Episode 1 Deliverables:</strong><br>
+        1. <strong>Identify the Lead Instantly:</strong> Introduce lead in the first shot under immediate pressure.<br>
+        2. <strong>Establish Source of Conflict & Antagonist:</strong> Make pain point unmistakable.<br>
+        3. <strong>Set Trajectory & Hook the Exit:</strong> Establish forward direction and cut on a hard hook.`
+      },
+      {
+        id: "list_ep1_traps",
+        category: "list",
+        categoryLabel: "Verbatim Lists",
+        title: "The 5 Traps Episode 1 MUST NOT Do",
+        prompt: "What 5 fatal mistakes must Episode 1 avoid at all costs?",
+        explanation: "Viewers decide to scroll away within seconds; holding back basic context causes confusion rather than curiosity.",
+        items: [
+          "Don't build entire complicated world",
+          "Don't explain every supporting character",
+          "Don't unpack complete backstory/lore",
+          "Don't overwhelm with information",
+          "Don't ask audience to wait and see"
+        ],
+        keywords: [
+          ["world", "complicat"],
+          ["support", "character"],
+          ["backstory", "lore"],
+          ["overwhelm", "info"],
+          ["wait", "see"]
+        ],
+        primerExcerpt: `<strong>The 5 Traps Episode 1 MUST NOT Do:</strong><br>
+        • DO NOT attempt to build an entire, complicated world.<br>
+        • DO NOT introduce or explain every secondary supporting character.<br>
+        • DO NOT unpack complete backstory or extended historical exposition.<br>
+        • DO NOT overwhelm the viewer with complex lore or rules.<br>
+        • DO NOT ask the audience to 'wait and see.'`
+      },
+      {
+        id: "list_visible_emotion",
+        category: "list",
+        categoryLabel: "Verbatim Lists",
+        title: "The 4 Vehicles for Visible Emotion",
+        prompt: "What 4 specific writing tools translate internal psychological feelings into readable vertical visuals?",
+        explanation: "Never merely write internal feelings like 'she felt heartbroken'; give behavior that the camera can capture.",
+        items: [
+          "Actions",
+          "Physical reaction",
+          "Visual insert",
+          "Voiceover (when necessary)"
+        ],
+        keywords: [
+          ["action"],
+          ["physical", "react"],
+          ["visual", "insert"],
+          ["voiceover", "vo"]
+        ],
+        primerExcerpt: `<strong>The 4 Vehicles for Visible Emotion:</strong><br>
+        1. Actions<br>
+        2. Physical reaction (white knuckles, trembling hands, draining color)<br>
+        3. Visual insert (torn documents, hidden medication, wedding ring)<br>
+        4. Voiceover (when necessary)`
+      },
+      {
+        id: "list_scripting_directives",
+        category: "list",
+        categoryLabel: "Verbatim Lists",
+        title: "The 3 Scripting Directives for Directors & Actors",
+        prompt: "What 3 things must a vertical screenplay make unmistakably clear for fast-paced director and actor prep?",
+        explanation: "Micro-drama directors shoot 10+ pages a day with only 1-2 weeks of prep; clarity eliminates on-set miscommunication.",
+        items: [
+          "How the character is feeling",
+          "When that feeling changes",
+          "What audience needs to notice with inserts/visuals"
+        ],
+        keywords: [
+          ["how", "feeling"],
+          ["when", "change"],
+          ["notice", "insert", "visual"]
+        ],
+        primerExcerpt: `<strong>The 3 Scripting Directives for Directors & Actors:</strong><br>
+        1. How exactly the character is feeling.<br>
+        2. When that feeling changes.<br>
+        3. What the audience needs to notice with the help of inserts and visual details at each moment.`
+      },
+      {
+        id: "list_dialogue_litmus",
+        category: "list",
+        categoryLabel: "Verbatim Lists",
+        title: "The 5-Part Dialogue Litmus Test",
+        prompt: "What 5 questions must every line of micro-drama dialogue satisfy? (If it does none, cut it)",
+        explanation: "Eliminate conversational filler like 'How are you?' or 'Are you okay?'. Dialogue must pack immediate punch.",
+        items: [
+          "Does it reveal vital info?",
+          "Does it increase dramatic tension?",
+          "Does it express heightened emotion?",
+          "Does it force a power shift?",
+          "Does it compel an immediate reaction/response?"
+        ],
+        keywords: [
+          ["vital", "info", "reveal"],
+          ["increase", "tension"],
+          ["heighten", "emotion", "express"],
+          ["power", "shift"],
+          ["compel", "react", "response"]
+        ],
+        primerExcerpt: `<strong>The 5-Part Dialogue Litmus Test:</strong><br>
+        1. Does it reveal vital information?<br>
+        2. Does it increase dramatic tension?<br>
+        3. Does it express a specific, heightened emotion?<br>
+        4. Does it force a power shift?<br>
+        5. Does it compel an immediate reaction/decision (force a response)?<br>
+        <em>If a line does none of these five things, cut it!</em>`
+      },
+      {
+        id: "list_supporting_scene_test",
+        category: "list",
+        categoryLabel: "Verbatim Lists",
+        title: "The 3-Part Scene Test for Supporting Scenes",
+        prompt: "What 3 questions must every supporting scene or subplot satisfy to earn its place in the script?",
+        explanation: "Never write independent secondary subplots that do not feed directly back into the core relationship.",
+        items: [
+          "Does this escalate the core conflict?",
+          "Does this advance the core wish fulfillment?",
+          "Does this continue the core loop?"
+        ],
+        keywords: [
+          ["escalat", "conflict"],
+          ["advance", "wish"],
+          ["continue", "loop"]
+        ],
+        primerExcerpt: `<strong>The 3-Part Scene Test for Supporting Scenes:</strong><br>
+        1. Does this escalate the core conflict?<br>
+        2. Does this advance the core wish fulfillment?<br>
+        3. Does this continue the core loop?<br>
+        <em>If the answer is no, cut the scene or fold it into an active confrontation.</em>`
+      },
+      {
+        id: "list_4_reactions",
+        category: "list",
+        categoryLabel: "Verbatim Lists",
+        title: "The 4 Emotional Reactions You Must Evoke",
+        prompt: "Regardless of genre, what 4 emotional reactions must a vertical screenwriter evoke in the audience?",
+        explanation: "As taught by Yijun Zhu, frameworks and tropes mean nothing if the script fails to evoke these visceral reactions.",
+        items: [
+          "Feel",
+          "Cry",
+          "Feel scared",
+          "Care about characters"
+        ],
+        keywords: [
+          ["feel"],
+          ["cry", "tear"],
+          ["scare", "fear"],
+          ["care"]
+        ],
+        primerExcerpt: `<strong>The 4 Emotional Reactions You Must Evoke (Yijun Zhu):</strong><br>
+        1. Feel<br>2. Cry<br>3. Feel scared<br>4. Care about the characters`
+      },
+      {
+        id: "list_vertical_visual_elements",
+        category: "list",
+        categoryLabel: "Verbatim Lists",
+        title: "7 Elements of Vertical Visual Language",
+        prompt: "What are the 7 core visual elements that distinguish vertical mobile cinematography?",
+        explanation: "Vertical 9:16 cinematography favors intimacy, micro-expressions, and foreground-background tension over wide environmental scale.",
+        items: [
+          "Close-ups",
+          "Reaction shots",
+          "Visual inserts",
+          "Foreground/background tension",
+          "Movement toward camera",
+          "Emotional confrontation",
+          "Dramatic booms and slow push-ins"
+        ],
+        keywords: [
+          ["close-up", "closeup"],
+          ["reaction"],
+          ["insert"],
+          ["foreground", "background"],
+          ["movement", "camera"],
+          ["confront"],
+          ["boom", "push-in", "pushin"]
+        ],
+        primerExcerpt: `<strong>The 7 Core Elements of Vertical Visual Language:</strong><br>
+        1. Close-ups (intense facial micro-expressions)<br>
+        2. Reaction shots (reveals experienced through the listener's face)<br>
+        3. Visual inserts (unmistakable visual proof: tests, heirlooms, weapons)<br>
+        4. Foreground/background tension<br>
+        5. Movement toward camera<br>
+        6. Emotional confrontation<br>
+        7. Dramatic booms and slow push-ins`
+      },
+      {
+        id: "list_9_cpi_triggers",
+        category: "list",
+        categoryLabel: "Verbatim Lists",
+        title: "The 9 Native CPI Moment Triggers",
+        prompt: "Name the 9 high-impact marketing moment triggers used to stop scrolling and drive app installs (CPI):",
+        explanation: "CPI clips give enough context to care, but withhold resolution so users download the app to see what happens next.",
+        items: [
+          "Meet-Cute",
+          "Villain Humiliation",
+          "Public Confrontation",
+          "Betrayal",
+          "Threat",
+          "Forced Choice",
+          "Secret Reveal",
+          "Romantic Dilemma",
+          "Reversal of Power"
+        ],
+        keywords: [
+          ["meet-cute", "meetcute"],
+          ["villain", "humil"],
+          ["public", "confront"],
+          ["betray"],
+          ["threat"],
+          ["forced", "choice"],
+          ["secret", "reveal"],
+          ["roman", "dilemma"],
+          ["revers", "power"]
+        ],
+        primerExcerpt: `<strong>The 9 Native CPI Moment Triggers:</strong><br>
+        1. Meet-Cute<br>2. Villain Humiliation<br>3. Public Confrontation<br>4. Betrayal<br>5. Threat<br>
+        6. Forced Choice<br>7. Secret Reveal<br>8. Romantic Dilemma<br>9. Reversal of Power`
+      },
+      {
+        id: "list_cpi_self_test",
+        category: "list",
+        categoryLabel: "Verbatim Lists",
+        title: "The 3 CPI Self-Test Questions",
+        prompt: "What 3 questions must a writer ask to ensure a scene can function as a standalone ad / CPI clip?",
+        explanation: "Strong emotional moments often become the viewer's first encounter with the series.",
+        items: [
+          "Which moment makes someone stop scrolling?",
+          "Can conflict be understood without extensive context?",
+          "Does it end with a question/reversal strong enough to make someone download or click?"
+        ],
+        keywords: [
+          ["stop", "scroll"],
+          ["without", "context"],
+          ["download", "click", "question", "reversal"]
+        ],
+        primerExcerpt: `<strong>The 3 CPI Self-Test Questions:</strong><br>
+        1. Which moment would make someone stop scrolling?<br>
+        2. Can the conflict be understood without extensive context?<br>
+        3. Does the moment end with a question, reversal, or emotional promise strong enough to make someone download or click?`
+      },
+      {
+        id: "list_rulebook_4_questions",
+        category: "list",
+        categoryLabel: "Verbatim Lists",
+        title: "The 4 Rulebook Questions to Return to Continuously",
+        prompt: "What are the 4 fundamental questions a micro-drama writer must revisit during every draft and revision?",
+        explanation: "These questions maintain focus on the central emotional engine and prevent narrative drift.",
+        items: [
+          "What is your core conflict, core wish fulfillment, and core loops?",
+          "What is your emotional engine?",
+          "What changes this episode?",
+          "Why tap next immediately?"
+        ],
+        keywords: [
+          ["conflict", "wish", "loop"],
+          ["emotional", "engine"],
+          ["what", "change"],
+          ["why", "tap", "next"]
+        ],
+        primerExcerpt: `<strong>The Rulebook: 4 Questions to Return to Continuously:</strong><br>
+        1. What is your core conflict, core wish fulfillment, and core loops?<br>
+        2. What is your emotional engine? (What is the audience waiting and hoping for?)<br>
+        3. What changes by the end of this episode on an episode level?<br>
+        4. What does the viewer need to watch? (Why tap next immediately?)`
+      },
+      {
+        id: "list_fatal_mistakes_triad",
+        category: "list",
+        categoryLabel: "Verbatim Lists",
+        title: "The 3 Fatal Writing Mistakes Triad",
+        prompt: "What are the three catastrophic writing mistakes that cause micro-dramas to fail or hemorrhage viewers?",
+        explanation: "Avoiding these three traps ensures high retention and prevents series burnout.",
+        items: [
+          "The Vague Opening (confusion instead of curiosity)",
+          "Melodrama Without Texture",
+          "Instant Gratification"
+        ],
+        keywords: [
+          ["vague", "opening", "confus"],
+          ["melodrama", "texture"],
+          ["instant", "gratificat", "early"]
+        ],
+        primerExcerpt: `<strong>The Three Fatal Writing Mistakes (Verbatim):</strong><br>
+        1. <strong>The Vague Opening (Confusion instead of Curiosity):</strong> Withholding context to engineer 'mystery'.<br>
+        2. <strong>Melodrama Without Texture:</strong> Screaming or crying without physical specificity or inserts.<br>
+        3. <strong>Instant Gratification:</strong> Granting full resolutions too early without immediate bigger complications.`
+      },
+      {
+        id: "list_live_action_ceilings",
+        category: "list",
+        categoryLabel: "Verbatim Lists",
+        title: "The 2 Hard Live-Action Script Ceilings",
+        prompt: "What are the two absolute live-action production ceilings that writers must strictly observe?",
+        explanation: "Unless writing for fully AI-generated pipelines, breaking these ceilings creates severe budget overruns.",
+        items: [
+          "Maximum 8 locations total",
+          "Maximum 30 cast members total"
+        ],
+        keywords: [
+          ["8", "eight", "location"],
+          ["30", "thirty", "cast", "member"]
+        ],
+        primerExcerpt: `<strong>Hard Live-Action Script Ceilings:</strong><br>
+        1. <strong>Maximum 8 Locations Total:</strong> The entire series must be contained within at most 8 physical locations.<br>
+        2. <strong>Maximum 30 Cast Members Total:</strong> Complete character breakdown must not exceed 30 speaking/functional roles.`
+      },
+      {
+        id: "list_production_penalties",
+        category: "list",
+        categoryLabel: "Verbatim Lists",
+        title: "The 4 Hidden Penalties of Every Location Move",
+        prompt: "What 4 time-consuming tasks must crew perform during even minor location shifts?",
+        explanation: "A move that takes 5 seconds on screen can burn 2-3 hours of production time off screen.",
+        items: [
+          "Move equipment",
+          "Re-light the space",
+          "Reset sound and camera",
+          "Dress the new location"
+        ],
+        keywords: [
+          ["move", "equip"],
+          ["light", "re-light"],
+          ["sound", "camera", "reset"],
+          ["dress", "prop"]
+        ],
+        primerExcerpt: `<strong>The Four Hidden Production Penalties of Every Location Move:</strong><br>
+        1. Move equipment (trucks, dollies, grip & electric gear)<br>
+        2. Re-light the space (repositioning fixtures from scratch)<br>
+        3. Reset sound and camera (re-measuring focal distances and acoustic levels)<br>
+        4. Dress the new location (art department staging props)`
+      },
+      {
+        id: "list_pull_mix_illusions",
+        category: "list",
+        categoryLabel: "Verbatim Lists",
+        title: "3 Illusions of Stationary Pull-Mix Vehicle Staging",
+        prompt: "What 3 practical techniques create the illusion of vehicle movement inside a stationary stage car?",
+        explanation: "Shooting on public streets requires permits and trailers; pull-mix staging is faster, cheaper, and safer.",
+        items: [
+          "Moving lights sweeping across faces",
+          "Immersive sound design",
+          "Subtle camera vibration/movement"
+        ],
+        keywords: [
+          ["moving", "light"],
+          ["sound", "audio"],
+          ["camera", "vibrat", "movement"]
+        ],
+        primerExcerpt: `<strong>Stationary Pull-Mix Vehicle Staging (The 3 Illusions):</strong><br>
+        1. Moving lights sweeping rhythmically across actors' faces.<br>
+        2. Immersive sound design (engine rev, tires, ambient traffic).<br>
+        3. Subtle camera vibration and handheld movement.`
+      },
+      {
+        id: "list_valid_flashbacks",
+        category: "list",
+        categoryLabel: "Verbatim Lists",
+        title: "The 2 Valid Types of Flashbacks",
+        prompt: "What are the only two permissible types of flashbacks in vertical micro-drama writing?",
+        explanation: "Never write leisurely atmospheric memory sequences; every flashback must execute an active dramatic task.",
+        items: [
+          "The Reversal Flashback (new information that changes the scene)",
+          "The Refresher Flashback (emotional anchor across multi-sitting viewing)"
+        ],
+        keywords: [
+          ["reversal", "new", "info"],
+          ["refresher", "anchor", "reminder"]
+        ],
+        primerExcerpt: `<strong>The Two Valid Types of Flashbacks:</strong><br>
+        1. <strong>The Reversal Flashback (New Information):</strong> Shows an earlier event from a new angle or context, completely changing the meaning of the present scene.<br>
+        2. <strong>The Refresher Flashback (Emotional Anchor):</strong> Brief reminder of trauma or vow established 30-40 episodes earlier, deployed across multi-sitting viewing.`
+      },
+
+      // ================= CRAFT DIAGNOSTICS & METRICS =================
+      {
+        id: "mcq_viewing_time",
+        category: "metrics",
+        categoryLabel: "Platform & Metrics",
+        title: "Prime-Time Mobile Viewing Setting",
+        prompt: "According to Holy Water and A.T. Kearney benchmark data, where and when does peak micro-drama consumption occur?",
+        type: "mcq",
+        options: [
+          "During daytime office commutes on subways and buses (68%)",
+          "Late night in bed before sleep (70%) and on the couch (59%)",
+          "Midday lunch breaks between 12:00 PM and 2:00 PM (62%)",
+          "Weekend afternoon leisure hours with sound on (75%)"
+        ],
+        answer: 1,
+        explanation: "Micro-dramas are NOT daytime soap operas watched on the run. They live in quiet, low-light, solitary moments at the end of the day in bed or on the couch.",
+        primerExcerpt: "70% of viewers watch in bed before sleep; 59% watch on the couch. Micro-dramas occupy the slot that prime-time TV used to hold."
+      },
+      {
+        id: "mcq_male_growth",
+        category: "metrics",
+        categoryLabel: "Platform & Metrics",
+        title: "Male Demographic Expansion",
+        prompt: "How dramatically did the male audience grow across 7 quarters according to platform reporting?",
+        type: "mcq",
+        options: [
+          "Rose from 25% to 35% of the total audience",
+          "Rose from 1.1% to 30.3% of the audience",
+          "Remained flat at approximately 5% due to female romance dominance",
+          "Declined slightly as young adult female viewership expanded"
+        ],
+        answer: 1,
+        explanation: "The male audience exploded from just 1.1% to 30.3% in only 7 quarters, with men indexing at 1.4x for Sci-Fi/Fantasy, and 54% consuming Romance.",
+        primerExcerpt: "Men grew from just 1.1% of the audience to 30.3% in only seven quarters, shattering the assumption that micro-dramas are solely for women over 35."
+      },
+      {
+        id: "mcq_production_pace",
+        category: "production",
+        categoryLabel: "Production & Ceilings",
+        title: "Standard Shoot Schedule & Pace",
+        prompt: "What is the standard production shooting schedule and daily page count for a live-action micro-series?",
+        type: "mcq",
+        options: [
+          "20 shoot days, averaging 3 to 4 pages per day",
+          "7 to 9 shoot days total, averaging 10+ pages per day",
+          "14 shoot days, averaging 6 pages per day with 2 weeks of actor rehearsals",
+          "3 shoot days, averaging 25 pages per day on mobile phones"
+        ],
+        answer: 1,
+        explanation: "A typical series shoots across 7 to 9 filming days with a lightning pace of 10+ script pages per day across 3 to 4 primary contained locations.",
+        primerExcerpt: "For a typical seven to nine-day shoot, we shoot 10+ script pages per day and concentrate the story around 3 to 4 main locations."
+      },
+      {
+        id: "mcq_story_vs_emotional_logic",
+        category: "diagnostic",
+        categoryLabel: "Craft Diagnostics",
+        title: "Story Logic vs. Emotional Logic",
+        prompt: "What is the fundamental operational difference between Story Logic and Emotional Logic in vertical scripts?",
+        type: "mcq",
+        options: [
+          "Story logic governs dialogue; emotional logic governs action line descriptions",
+          "Story logic asks if plot events connect causally; emotional logic is the moment-by-moment driver of tension and loops",
+          "Story logic applies only to Episode 1; emotional logic applies only to the series finale",
+          "There is no difference; micro-dramas follow traditional three-act screenplay causality"
+        ],
+        answer: 1,
+        explanation: "A micro-drama scene can tolerate minor plot logic flaws, but it will immediately hemorrhage viewers if the emotional rhythm plateaus or goes flat.",
+        primerExcerpt: "Story Logic asks 'Do plot events connect causally?'; Emotional Logic is the moment-by-moment, episode-by-episode driver of the entire series engine and core loop."
+      },
+      {
+        id: "mcq_curiosity_vs_confusion",
+        category: "diagnostic",
+        categoryLabel: "Craft Diagnostics",
+        title: "Curiosity vs. Confusion Opening Diagnostic",
+        prompt: "Which question indicates the fatal trap of Confusion rather than healthy narrative Curiosity?",
+        type: "mcq",
+        options: [
+          "'Why is she hiding her true identity?'",
+          "'What will happen when they discover the truth?'",
+          "'What is going on?'",
+          "'Why is he so terrified of this woman?'"
+        ],
+        answer: 2,
+        explanation: "When viewers ask 'What is going on?', they feel disoriented and swipe away. The screenwriter must actively engineer clear questions about stakes and consequences.",
+        primerExcerpt: "The Fatal Trap (Confusion) asks 'What is going on?'. The Screenwriter's Objective (Curiosity) provokes 'Why is she hiding?' or 'What happens when they discover the truth?'"
+      },
+      {
+        id: "mcq_two_steps_ahead",
+        category: "diagnostic",
+        categoryLabel: "Craft Diagnostics",
+        title: "The 'Two Steps Ahead' Frustration Engine",
+        prompt: "Why must the audience always be at least two steps ahead of the characters on screen?",
+        type: "mcq",
+        options: [
+          "It allows the production to use fewer voiceover lines",
+          "Agonizing dramatic irony (knowing the truth while characters are deceived) fuels frustration and coin conversion",
+          "It allows the writer to skip writing Episode 1 cliffhangers",
+          "It guarantees the script will be purchased by Chinese distributors"
+        ],
+        answer: 1,
+        explanation: "Frustration is the primary driver of coin spend. Audiences pay money to see the hammer fall and witness the catharsis of exposure.",
+        primerExcerpt: "Vertical micro-drama leans on Agonizing Frustration ('I know the truth, and I am dying inside watching these characters be deceived!'). Frustration is the primary driver of paid conversion."
+      },
+      {
+        id: "mcq_save_the_cat",
+        category: "diagnostic",
+        categoryLabel: "Craft Diagnostics",
+        title: "Micro-Drama 'Save the Cat' Formula",
+        prompt: "What is the revised formula for the 'Save the Cat' moment in vertical micro-drama?",
+        type: "mcq",
+        options: [
+          "Empathy + Backstory + Monologue",
+          "Empathy + Conflict + Momentum",
+          "Humiliation + Romance + Voiceover",
+          "Mystery + Dialogue + Stunt Collision"
+        ],
+        answer: 1,
+        explanation: "Characterization cannot pause the narrative. The specific action that makes us care about the lead must immediately launch them into hot water.",
+        primerExcerpt: "Traditional Save the Cat = Empathy. Micro-Drama Save the Cat = Empathy + Conflict + Momentum. The moment that makes us care about the protagonist must also put them in trouble."
+      },
+      {
+        id: "mcq_dead_time_axiom",
+        category: "diagnostic",
+        categoryLabel: "Craft Diagnostics",
+        title: "The Ultimate Screenwriting Axiom",
+        prompt: "Complete the ultimate writing axiom: 'The enemy is ________, not slowness.'",
+        type: "mcq",
+        options: [
+          "Subtle acting",
+          "Dead time",
+          "Contained staging",
+          "Short dialogue"
+        ],
+        answer: 1,
+        explanation: "Quiet, vulnerable scenes hold attention if tension and curiosity exist. Dead time is any moment without tension, emotion, curiosity, or change.",
+        primerExcerpt: "The Ultimate Writing Axiom: 'The enemy is DEAD TIME, not slowness.' Quiet scenes hold attention if tension and curiosity exist. Attention is never assumed; it must be earned every second."
+      }
+    ];
+
+    const STORAGE_KEY = 'micro_drama_mastery_state_v4';
+
+    let currentStudyMode = 'practice'; // 'practice' | 'exam' | 'review' | 'primer'
+    let currentCategory = 'all';
+    let activeDeck = [];
+    let currentDeckIndex = 0;
+    let isFocusMode = false;
+    
+    // In-memory state tracking with localStorage persistence
+    let omittedIds = new Set();
+    let smartReviewQueue = new Set();
+    let stats = {
+      audited: 0,
+      correct: 0
+    };
+
+    function saveState() {
+      try {
+        const payload = {
+          omittedIds: Array.from(omittedIds),
+          smartReviewQueue: Array.from(smartReviewQueue),
+          stats: stats,
+          soundEnabled: soundEnabled
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+      } catch (e) {
+        console.warn('Unable to persist state to localStorage', e);
+      }
+    }
+
+    function loadState() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed.omittedIds)) {
+            omittedIds = new Set(parsed.omittedIds);
+          }
+          if (Array.isArray(parsed.smartReviewQueue)) {
+            smartReviewQueue = new Set(parsed.smartReviewQueue);
+          }
+          if (parsed.stats && typeof parsed.stats.audited === 'number' && typeof parsed.stats.correct === 'number') {
+            stats = parsed.stats;
+          }
+          if (typeof parsed.soundEnabled === 'boolean') {
+            soundEnabled = parsed.soundEnabled;
+            const soundIcon = document.getElementById('soundIcon');
+            if (soundIcon) soundIcon.innerText = soundEnabled ? '🔊' : '🔇';
+            const microSoundIcon = document.getElementById('microSoundIcon');
+            if (microSoundIcon) microSoundIcon.innerText = soundEnabled ? '🔊' : '🔇';
+          }
+        }
+      } catch (e) {
+        console.warn('Unable to load state from localStorage', e);
+      }
+    }
+
+    // Sub-mode for verbatim list items ('typeahead' or 'audit')
+    let listRecallMode = 'typeahead';
+    let matchedListIndices = new Set();
+
+    // Sequence interactive state
+    let sequenceUserOrder = []; // indices chosen by user
+
+    function rebuildActiveDeck() {
+      let filtered = MASTER_QUESTIONS.filter(q => !omittedIds.has(q.id));
+
+      if (currentStudyMode === 'review') {
+        filtered = filtered.filter(q => smartReviewQueue.has(q.id));
+      } else if (currentCategory !== 'all') {
+        filtered = filtered.filter(q => q.category === currentCategory);
+      }
+
+      activeDeck = filtered;
+      if (currentDeckIndex >= activeDeck.length) {
+        currentDeckIndex = Math.max(0, activeDeck.length - 1);
+      }
+      updateUIHeaderBadges();
+    }
+
+    function filterCategory(cat) {
+      currentCategory = cat;
+      document.querySelectorAll('#categoryFilterBar button').forEach(b => {
+        b.className = "px-2.5 py-1 rounded-full whitespace-nowrap bg-slate-800/80 hover:bg-slate-800 text-slate-400 hover:text-slate-200 border border-slate-700/60 font-medium";
+      });
+      const activeBtn = document.getElementById(`catBtn-${cat}`);
+      if (activeBtn) {
+        activeBtn.className = "px-2.5 py-1 rounded-full whitespace-nowrap bg-indigo-600/30 border border-indigo-500/50 text-indigo-300 font-medium";
+      }
+      currentDeckIndex = 0;
+      rebuildActiveDeck();
+      renderActiveCard();
+      playSound('click');
+    }
+
+    function setStudyMode(mode) {
+      currentStudyMode = mode;
+      
+      // Update top tab active classes
+      const tabs = ['practice', 'exam', 'review', 'primer'];
+      tabs.forEach(t => {
+        const btn = document.getElementById(`modeTab-${t}`);
+        if (t === mode) {
+          btn.className = "px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 bg-brand-600 text-white shadow-sm shadow-brand-500/30 font-medium";
+        } else {
+          btn.className = "px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800 font-medium";
+        }
+      });
+
+      const catBar = document.getElementById('categoryFilterBar');
+      const progressContainer = document.getElementById('sessionProgressContainer');
+      const cardViewport = document.getElementById('cardViewport');
+      const primerViewport = document.getElementById('primerViewport');
+      const emptyViewport = document.getElementById('emptyStateViewport');
+
+      if (mode === 'primer') {
+        catBar.classList.add('hidden');
+        progressContainer.classList.add('hidden');
+        cardViewport.classList.add('hidden');
+        emptyViewport.classList.add('hidden');
+        primerViewport.classList.remove('hidden');
+        if (isFocusMode) toggleFocusMode(); // restore standard view for readable reading
+        renderPrimerMode();
+      } else {
+        if (!isFocusMode) catBar.classList.remove('hidden');
+        progressContainer.classList.remove('hidden');
+        cardViewport.classList.remove('hidden');
+        primerViewport.classList.add('hidden');
+        currentDeckIndex = 0;
+        rebuildActiveDeck();
+        renderActiveCard();
+      }
+      playSound('click');
+    }
+
+    function toggleFocusMode() {
+      isFocusMode = !isFocusMode;
+
+      const mainBar = document.getElementById('headerMainBar');
+      const modeBar = document.getElementById('headerModeBar');
+      const catBar = document.getElementById('categoryFilterBar');
+      const microBar = document.getElementById('focusMicroBar');
+      const toggleBtn = document.getElementById('focusToggleBtn');
+
+      if (isFocusMode) {
+        mainBar.classList.add('hidden');
+        modeBar.classList.add('hidden');
+        catBar.classList.add('hidden');
+        microBar.classList.remove('hidden');
+        if (toggleBtn) toggleBtn.innerHTML = '<span>📱</span><span>Exit Focus</span>';
+      } else {
+        mainBar.classList.remove('hidden');
+        modeBar.classList.remove('hidden');
+        if (currentStudyMode !== 'primer') catBar.classList.remove('hidden');
+        microBar.classList.add('hidden');
+        if (toggleBtn) toggleBtn.innerHTML = '<span>📱</span><span>Focus Mode</span>';
+      }
+
+      updateUIHeaderBadges();
+      playSound('click');
+      setTimeout(stabilizeCardScroll, 100);
+    }
+
+    function stabilizeCardScroll() {
+      const container = document.getElementById('sessionProgressContainer');
+      if (!container) return;
+
+      const rect = container.getBoundingClientRect();
+      const headerEl = document.querySelector('header');
+      const headerHeight = headerEl ? headerEl.offsetHeight : 50;
+
+      // If the card is scrolled out of view, keep it neatly aligned right beneath the header
+      if (rect.top < headerHeight || rect.top > headerHeight + 100) {
+        const targetY = window.pageYOffset + rect.top - headerHeight - 6;
+        window.scrollTo({ top: Math.max(0, targetY), behavior: 'smooth' });
+      }
+    }
+
+    function shuffleDeck() {
+      for (let i = activeDeck.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [activeDeck[i], activeDeck[j]] = [activeDeck[j], activeDeck[i]];
+      }
+      currentDeckIndex = 0;
+      renderActiveCard();
+      playSound('click');
+    }
+
+    function renderActiveCard() {
+      const cardViewport = document.getElementById('cardViewport');
+      const emptyViewport = document.getElementById('emptyStateViewport');
+
+      if (activeDeck.length === 0) {
+        cardViewport.classList.add('hidden');
+        emptyViewport.classList.remove('hidden');
+        return;
+      }
+
+      cardViewport.classList.remove('hidden');
+      emptyViewport.classList.add('hidden');
+
+      const card = activeDeck[currentDeckIndex];
+      matchedListIndices = new Set();
+      sequenceUserOrder = [];
+
+      // Update progress bar
+      const progressPercent = Math.round(((currentDeckIndex + 1) / activeDeck.length) * 100);
+      document.getElementById('deckProgressLabel').innerText = `Card ${currentDeckIndex + 1} of ${activeDeck.length} (${card.categoryLabel})`;
+      document.getElementById('deckPercentageLabel').innerText = `${progressPercent}%`;
+      document.getElementById('deckProgressBar').style.width = `${progressPercent}%`;
+
+      let innerContent = '';
+
+      if (card.type === 'mcq') {
+        innerContent = renderMCQView(card);
+      } else if (card.category === 'sequence') {
+        innerContent = renderSequenceView(card);
+      } else {
+        innerContent = renderListView(card);
+      }
+
+      cardViewport.innerHTML = `
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3.5 sm:p-7 shadow-xl flex flex-col flex-1 transition-all">
+          
+          <!-- Card Header & Metadata -->
+          <div class="flex flex-wrap items-center justify-between gap-2 pb-3 sm:pb-4 mb-3 sm:pb-4 border-b border-slate-800/80">
+            <div class="flex items-center gap-2">
+              <span class="text-xs px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 font-mono border border-slate-700/60 font-semibold">
+                ${card.categoryLabel}
+              </span>
+              <span class="text-xs text-slate-400 font-mono hidden xs:inline">ID: ${card.id}</span>
+            </div>
+
+            <!-- Card Actions -->
+            <div class="flex items-center gap-1.5 sm:gap-2">
+              <button onclick="toggleFocusMode()" class="px-2 py-1 text-xs rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 sm:hidden flex items-center gap-1" title="Toggle Compact View">
+                <span>${isFocusMode ? '⛶' : '📱'}</span>
+              </button>
+              <button onclick="openPrimerModal('${card.id}')" class="px-2.5 py-1 text-xs rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 flex items-center gap-1 transition">
+                <span>📖</span> <span>Peek</span>
+              </button>
+              <button onclick="omitCurrentQuestion('${card.id}')" class="px-2.5 py-1 text-xs rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 flex items-center gap-1 transition" title="Omit this card from all quiz queues">
+                <span>🚫</span> <span>Omit</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Card Title & Prompt -->
+          <div class="mb-3 sm:mb-5">
+            <h2 class="text-base sm:text-xl font-bold text-white tracking-tight leading-snug">${card.title}</h2>
+            <p class="text-xs sm:text-base text-slate-300 mt-1 font-normal leading-relaxed">${card.prompt}</p>
+          </div>
+
+          <!-- Dynamic Interaction Body -->
+          <div id="cardInteractiveBody" class="flex-1">
+            ${innerContent}
+          </div>
+
+          <!-- Card Footer & Nav -->
+          <div class="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-slate-800 flex items-center justify-between">
+            <button onclick="prevCard()" ${currentDeckIndex === 0 ? 'disabled' : ''} class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed text-xs sm:text-sm font-medium text-slate-300 transition">
+              ← Prev
+            </button>
+            <div class="text-xs text-slate-400 hidden sm:block">
+              Shortcuts: <kbd class="px-1.5 py-0.5 rounded bg-slate-800 font-mono text-[10px]">Enter</kbd> next • <kbd class="px-1.5 py-0.5 rounded bg-slate-800 font-mono text-[10px]">Space</kbd> reveal
+            </div>
+            <button onclick="nextCard()" class="px-4 py-1.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-xs sm:text-sm font-semibold text-white shadow-md shadow-brand-500/20 transition flex items-center gap-1">
+              <span>Next</span> →
+            </button>
+          </div>
+        </div>
+      `;
+
+      // Post-mount focus for Smart Type-Ahead
+      if (card.category === 'list' && listRecallMode === 'typeahead') {
+        const inputEl = document.getElementById('typeAheadInput');
+        if (inputEl && window.innerWidth >= 640) inputEl.focus();
+      }
+    }
+
+    function renderListView(card) {
+      const isExam = currentStudyMode === 'exam';
+
+      return `
+        <div class="space-y-3 sm:space-y-4">
+          <!-- Dual Mode Toggle (Only in Practice Mode) -->
+          ${!isExam ? `
+            <div class="flex items-center justify-between bg-slate-950/70 p-1.5 rounded-xl border border-slate-800 text-xs">
+              <span class="text-slate-400 font-medium pl-1.5 hidden sm:inline">Recall Mode:</span>
+              <div class="flex gap-1 w-full sm:w-auto justify-between sm:justify-end">
+                <button onclick="toggleListMode('typeahead')" class="flex-1 sm:flex-initial px-2.5 py-1 rounded-lg font-medium transition text-center ${listRecallMode === 'typeahead' ? 'bg-brand-600 text-white' : 'text-slate-400 hover:text-white'}">
+                  ⌨️ Type-Ahead
+                </button>
+                <button onclick="toggleListMode('audit')" class="flex-1 sm:flex-initial px-2.5 py-1 rounded-lg font-medium transition text-center ${listRecallMode === 'audit' ? 'bg-brand-600 text-white' : 'text-slate-400 hover:text-white'}">
+                  🧠 Recite & Audit
+                </button>
+              </div>
+            </div>
+          ` : `
+            <div class="bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs p-2 rounded-xl">
+              🎯 <strong>Mastery Exam Mode:</strong> Mentally recite all items, then reveal to audit retention.
+            </div>
+          `}
+
+          <!-- Smart Type-Ahead View -->
+          ${(listRecallMode === 'typeahead' && !isExam) ? `
+            <div class="space-y-2 sm:space-y-3">
+              <div class="relative">
+                <input 
+                  type="text" 
+                  id="typeAheadInput" 
+                  oninput="handleTypeAhead(event, '${card.id}')"
+                  placeholder="Type any keyword (e.g., 'humil', 'corner')... locks automatically" 
+                  class="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 font-sans"
+                  autocomplete="off"
+                />
+                <div id="typeMatchPulse" class="absolute right-3 top-2 text-xs font-mono text-emerald-400 font-bold hidden">
+                  MATCH! ✓
+                </div>
+              </div>
+
+              <!-- Live Items Slot Grid -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 sm:gap-2 mt-1 sm:mt-2" id="listSlotsContainer">
+                ${card.items.map((item, idx) => `
+                  <div id="slot-${idx}" class="py-1.5 px-2.5 sm:p-2.5 rounded-xl border border-slate-800 bg-slate-950/40 text-xs sm:text-sm flex items-center justify-between text-slate-400 transition-all">
+                    <span class="flex items-center gap-2">
+                      <span class="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-slate-800 text-slate-400 text-[10px] sm:text-[11px] font-mono flex items-center justify-center font-bold">${idx + 1}</span>
+                      <span class="slot-text tracking-wide font-mono text-[11px] sm:text-xs">••••••••••••••••</span>
+                    </span>
+                    <span class="slot-status text-slate-600 text-[10px] sm:text-xs">Waiting...</span>
+                  </div>
+                `).join('')}
+              </div>
+
+              <div class="flex items-center justify-between pt-1">
+                <span id="matchCounter" class="text-[11px] sm:text-xs font-mono text-slate-400">0 of ${card.items.length} matched</span>
+                <button onclick="revealAllListItems('${card.id}')" class="text-[11px] sm:text-xs text-indigo-400 hover:text-indigo-300 font-medium">
+                  Reveal All
+                </button>
+              </div>
+            </div>
+          ` : `
+            <!-- Self-Audit / Blind Recall View -->
+            <div class="space-y-3">
+              <div id="auditItemsList" class="space-y-2">
+                <div class="p-6 text-center bg-slate-950/60 border border-slate-800 rounded-xl" id="preRevealBox">
+                  <div class="text-2xl mb-2">🤔</div>
+                  <p class="text-sm text-slate-300 font-medium">Recite all <span class="text-brand-400 font-bold">${card.items.length} items</span> out loud or in your head.</p>
+                  <p class="text-xs text-slate-400 mt-1">Once you've recited as many as you can, reveal to audit yourself honestly.</p>
+                  <button onclick="revealAuditView('${card.id}')" class="mt-4 px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-semibold text-xs transition shadow-lg shadow-brand-500/20">
+                    Reveal All & Audit Answers
+                  </button>
+                </div>
+              </div>
+            </div>
+          `}
+        </div>
+      `;
+    }
+
+    function toggleListMode(mode) {
+      listRecallMode = mode;
+      renderActiveCard();
+      playSound('click');
+    }
+
+    function handleTypeAhead(e, cardId) {
+      const card = MASTER_QUESTIONS.find(q => q.id === cardId);
+      if (!card || !card.keywords) return;
+
+      const inputVal = e.target.value.trim().toLowerCase();
+      if (inputVal.length < 2) return;
+
+      let matchedIndex = -1;
+
+      card.keywords.forEach((keywordGroup, idx) => {
+        if (matchedListIndices.has(idx)) return; // already locked
+
+        const hasMatch = keywordGroup.some(kw => inputVal.includes(kw.toLowerCase()));
+        if (hasMatch) {
+          matchedIndex = idx;
+        }
+      });
+
+      if (matchedIndex !== -1) {
+        matchedListIndices.add(matchedIndex);
+        playSound('match');
+
+        // Visual feedback on slot
+        const slotEl = document.getElementById(`slot-${matchedIndex}`);
+        if (slotEl) {
+          slotEl.className = "p-2.5 rounded-xl border border-emerald-500/40 bg-emerald-500/10 text-xs sm:text-sm flex items-center justify-between text-emerald-200 transition-all font-medium animate-pulse-success";
+          slotEl.querySelector('.slot-text').innerText = card.items[matchedIndex];
+          slotEl.querySelector('.slot-status').innerHTML = "✓ Locked";
+        }
+
+        // Show pulse indicator
+        const pulse = document.getElementById('typeMatchPulse');
+        if (pulse) {
+          pulse.classList.remove('hidden');
+          setTimeout(() => pulse.classList.add('hidden'), 600);
+        }
+
+        // Clear input box for next term
+        e.target.value = '';
+
+        // Update counter
+        const counter = document.getElementById('matchCounter');
+        if (counter) {
+          counter.innerText = `${matchedListIndices.size} of ${card.items.length} matched`;
+        }
+
+        // Check if all matched
+        if (matchedListIndices.size === card.items.length) {
+          playSound('success');
+          stats.audited++;
+          stats.correct++;
+          smartReviewQueue.delete(card.id);
+          updateUIHeaderBadges();
+          saveState();
+        }
+      }
+    }
+
+    function revealAllListItems(cardId) {
+      const card = MASTER_QUESTIONS.find(q => q.id === cardId);
+      if (!card) return;
+
+      // Add to review queue if not 100% matched
+      if (matchedListIndices.size < card.items.length) {
+        smartReviewQueue.add(card.id);
+        stats.audited++;
+        updateUIHeaderBadges();
+        saveState();
+      }
+
+      card.items.forEach((item, idx) => {
+        const slotEl = document.getElementById(`slot-${idx}`);
+        if (slotEl && !matchedListIndices.has(idx)) {
+          slotEl.className = "p-2.5 rounded-xl border border-amber-500/40 bg-amber-500/10 text-xs sm:text-sm flex items-center justify-between text-amber-200";
+          slotEl.querySelector('.slot-text').innerText = item;
+          slotEl.querySelector('.slot-status').innerHTML = "Missed";
+        }
+      });
+      playSound('click');
+    }
+
+    function revealAuditView(cardId) {
+      const card = MASTER_QUESTIONS.find(q => q.id === cardId);
+      if (!card) return;
+
+      const container = document.getElementById('auditItemsList');
+      if (!container) return;
+
+      container.innerHTML = `
+        <div class="space-y-2">
+          <div class="text-xs text-slate-400 font-medium pb-1 flex justify-between">
+            <span>Check the items you remembered correctly:</span>
+            <button onclick="auditCheckAll('${card.id}', true)" class="text-brand-400 hover:underline">Select All</button>
+          </div>
+          ${card.items.map((item, idx) => `
+            <label class="flex items-center justify-between p-3 rounded-xl border border-slate-800 bg-slate-950/70 hover:bg-slate-950 cursor-pointer text-xs sm:text-sm text-slate-200 transition">
+              <span class="flex items-center gap-2">
+                <span class="w-5 h-5 rounded-full bg-slate-800 text-slate-300 text-[11px] font-mono flex items-center justify-center font-bold">${idx + 1}</span>
+                <span>${item}</span>
+              </span>
+              <input type="checkbox" name="auditCheck" data-idx="${idx}" onchange="updateAuditScore('${card.id}')" class="w-4 h-4 rounded text-brand-600 focus:ring-brand-500 border-slate-700 bg-slate-800">
+            </label>
+          `).join('')}
+          <div class="pt-2 flex justify-between items-center text-xs text-slate-400">
+            <span id="auditScoreReport">0 / ${card.items.length} items checked</span>
+          </div>
+        </div>
+      `;
+      playSound('click');
+    }
+
+    function auditCheckAll(cardId, state) {
+      const card = MASTER_QUESTIONS.find(q => q.id === cardId);
+      if (!card) return;
+      document.querySelectorAll('input[name="auditCheck"]').forEach(cb => cb.checked = state);
+      updateAuditScore(cardId);
+    }
+
+    function updateAuditScore(cardId) {
+      const card = MASTER_QUESTIONS.find(q => q.id === cardId);
+      if (!card) return;
+      const checked = document.querySelectorAll('input[name="auditCheck"]:checked').length;
+      const report = document.getElementById('auditScoreReport');
+      if (report) {
+        report.innerText = `${checked} / ${card.items.length} items verified`;
+      }
+
+      stats.audited++;
+      if (checked === card.items.length) {
+        stats.correct++;
+        smartReviewQueue.delete(card.id);
+        playSound('success');
+      } else {
+        smartReviewQueue.add(card.id);
+        playSound('match');
+      }
+      updateUIHeaderBadges();
+      saveState();
+    }
+
+    function renderSequenceView(card) {
+      const isExam = currentStudyMode === 'exam';
+
+      // Shuffled copy of items for Click-to-Order
+      let shuffledItems = card.items.map((text, originalIndex) => ({ text, originalIndex }));
+      for (let i = shuffledItems.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffledItems[i], shuffledItems[j]] = [shuffledItems[j], shuffledItems[i]];
+      }
+
+      window.currentShuffledSequence = shuffledItems;
+      sequenceUserOrder = [];
+
+      return `
+        <div class="space-y-4">
+          ${!isExam ? `
+            <div class="bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 text-xs p-2.5 rounded-xl flex items-center justify-between">
+              <span><strong>Tactile Sequence Mode:</strong> Tap tiles in chronological order to arrange the steps.</span>
+              <button onclick="resetSequenceOrder('${card.id}')" class="text-xs underline text-indigo-300 hover:text-white">Reset</button>
+            </div>
+
+            <!-- Ordered Slots Box -->
+            <div class="space-y-1.5" id="sequenceSlots">
+              ${card.items.map((_, idx) => `
+                <div id="seqSlot-${idx}" class="p-2.5 rounded-xl border border-slate-800 bg-slate-950/60 text-xs sm:text-sm flex items-center justify-between text-slate-500">
+                  <span class="flex items-center gap-2">
+                    <span class="w-5 h-5 rounded-full bg-slate-800 text-slate-400 text-[11px] font-mono flex items-center justify-center font-bold">${idx + 1}</span>
+                    <span class="seqSlotText italic">Select Step ${idx + 1}...</span>
+                  </span>
+                  <span class="seqSlotStatus text-xs">Empty</span>
+                </div>
+              `).join('')}
+            </div>
+
+            <!-- Shuffled Selectable Tiles -->
+            <div class="pt-3">
+              <div class="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-2">Available Steps (Tap to place):</div>
+              <div class="flex flex-wrap gap-2" id="sequencePillPool">
+                ${shuffledItems.map((item, pIdx) => `
+                  <button id="seqPill-${pIdx}" onclick="handleSequencePillClick(${pIdx}, '${card.id}')" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs sm:text-sm text-slate-200 border border-slate-700/80 transition active:scale-95 text-left">
+                    ${item.text}
+                  </button>
+                `).join('')}
+              </div>
+            </div>
+
+            <div id="sequenceFeedback" class="hidden text-xs p-3 rounded-xl font-medium"></div>
+          ` : `
+            <!-- Strict Blind Sequence Recall for Exam -->
+            <div class="space-y-3">
+              <div class="p-5 text-center bg-slate-950/70 border border-slate-800 rounded-xl" id="blindSeqBox">
+                <div class="text-2xl mb-2">🔒</div>
+                <h4 class="text-sm font-bold text-white mb-1">Blind Sequence Recall</h4>
+                <p class="text-xs text-slate-300 max-w-md mx-auto">Mentally walk through all ${card.items.length} steps in exact chronological progression before revealing.</p>
+                <button onclick="revealBlindSequence('${card.id}')" class="mt-4 px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-semibold text-xs shadow-md shadow-brand-500/20">
+                  Reveal & Self-Audit Order
+                </button>
+              </div>
+              <div id="blindSeqRevealed" class="hidden space-y-2"></div>
+            </div>
+          `}
+        </div>
+      `;
+    }
+
+    function handleSequencePillClick(pillIndex, cardId) {
+      const card = MASTER_QUESTIONS.find(q => q.id === cardId);
+      if (!card || !window.currentShuffledSequence) return;
+
+      const currentStep = sequenceUserOrder.length;
+      if (currentStep >= card.items.length) return;
+
+      const itemObj = window.currentShuffledSequence[pillIndex];
+      sequenceUserOrder.push(itemObj);
+
+      // Disable clicked pill
+      const pillBtn = document.getElementById(`seqPill-${pillIndex}`);
+      if (pillBtn) {
+        pillBtn.classList.add('opacity-30', 'cursor-not-allowed', 'pointer-events-none');
+      }
+
+      // Populate slot
+      const slot = document.getElementById(`seqSlot-${currentStep}`);
+      if (slot) {
+        slot.className = "p-2.5 rounded-xl border border-slate-700 bg-slate-900 text-xs sm:text-sm flex items-center justify-between text-slate-200 font-medium";
+        slot.querySelector('.seqSlotText').innerText = itemObj.text;
+        slot.querySelector('.seqSlotStatus').innerText = "Placed";
+      }
+
+      playSound('click');
+
+      // Check if all placed
+      if (sequenceUserOrder.length === card.items.length) {
+        validateSequence(card);
+      }
+    }
+
+    function validateSequence(card) {
+      let allCorrect = true;
+
+      sequenceUserOrder.forEach((placed, idx) => {
+        const slot = document.getElementById(`seqSlot-${idx}`);
+        if (placed.text === card.items[idx]) {
+          slot.className = "p-2.5 rounded-xl border border-emerald-500/50 bg-emerald-500/10 text-xs sm:text-sm flex items-center justify-between text-emerald-200 font-medium";
+          slot.querySelector('.seqSlotStatus').innerHTML = "✓ Correct";
+        } else {
+          allCorrect = false;
+          slot.className = "p-2.5 rounded-xl border border-rose-500/50 bg-rose-500/10 text-xs sm:text-sm flex items-center justify-between text-rose-200 font-medium";
+          slot.querySelector('.seqSlotStatus').innerHTML = `✗ Expected: ${card.items[idx]}`;
+        }
+      });
+
+      const feedback = document.getElementById('sequenceFeedback');
+      feedback.classList.remove('hidden');
+
+      stats.audited++;
+      if (allCorrect) {
+        stats.correct++;
+        smartReviewQueue.delete(card.id);
+        feedback.className = "text-xs p-3 rounded-xl font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
+        feedback.innerHTML = "🎉 <strong>Perfect Recall!</strong> Sequence arranged in flawless chronological order.";
+        playSound('success');
+      } else {
+        smartReviewQueue.add(card.id);
+        feedback.className = "text-xs p-3 rounded-xl font-medium bg-rose-500/20 text-rose-300 border border-rose-500/30";
+        feedback.innerHTML = "⚠️ <strong>Sequence Out of Order:</strong> Review the correct positions highlighted above.";
+        playSound('error');
+      }
+      updateUIHeaderBadges();
+      saveState();
+    }
+
+    function resetSequenceOrder(cardId) {
+      const card = MASTER_QUESTIONS.find(q => q.id === cardId);
+      if (!card) return;
+      sequenceUserOrder = [];
+      const body = document.getElementById('cardInteractiveBody');
+      if (body) {
+        body.innerHTML = renderSequenceView(card);
+      }
+      playSound('click');
+    }
+
+    function revealBlindSequence(cardId) {
+      const card = MASTER_QUESTIONS.find(q => q.id === cardId);
+      if (!card) return;
+
+      document.getElementById('blindSeqBox').classList.add('hidden');
+      const container = document.getElementById('blindSeqRevealed');
+      container.classList.remove('hidden');
+
+      container.innerHTML = `
+        <div class="space-y-2">
+          <div class="text-xs text-slate-400 font-medium">Correct Sequential Order:</div>
+          ${card.items.map((item, idx) => `
+            <div class="p-3 rounded-xl border border-slate-800 bg-slate-950/70 text-xs sm:text-sm text-slate-200 flex items-center gap-3">
+              <span class="w-6 h-6 rounded-full bg-brand-600/30 text-brand-300 font-mono text-xs flex items-center justify-center font-bold border border-brand-500/40">${idx + 1}</span>
+              <span class="font-medium">${item}</span>
+            </div>
+          `).join('')}
+
+          <div class="p-4 bg-slate-950 rounded-xl border border-slate-800 mt-4 flex items-center justify-between">
+            <span class="text-xs text-slate-300 font-medium">Did you recall this entire sequence in exact order?</span>
+            <div class="flex gap-2">
+              <button onclick="auditBlindSeqResult('${card.id}', false)" class="px-3 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 text-xs font-semibold">Missed Order</button>
+              <button onclick="auditBlindSeqResult('${card.id}', true)" class="px-3 py-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 text-xs font-semibold">Recalled 100%</button>
+            </div>
+          </div>
+        </div>
+      `;
+      playSound('click');
+    }
+
+    function auditBlindSeqResult(cardId, passed) {
+      stats.audited++;
+      if (passed) {
+        stats.correct++;
+        smartReviewQueue.delete(cardId);
+        playSound('success');
+      } else {
+        smartReviewQueue.add(cardId);
+        playSound('error');
+      }
+      updateUIHeaderBadges();
+      saveState();
+      nextCard();
+    }
+
+    function renderMCQView(card) {
+      const letters = ['A', 'B', 'C', 'D'];
+
+      return `
+        <div class="space-y-3">
+          <div class="grid grid-cols-1 gap-2.5" id="mcqOptionsContainer">
+            ${card.options.map((opt, idx) => `
+              <button 
+                id="mcqOpt-${idx}" 
+                onclick="handleMCQSelection(${idx}, '${card.id}')"
+                class="p-3.5 rounded-xl border border-slate-800 bg-slate-950/60 hover:bg-slate-950 text-left text-xs sm:text-sm text-slate-200 transition flex items-center gap-3 group focus:outline-none focus:border-brand-500"
+              >
+                <span class="w-6 h-6 rounded-lg bg-slate-800 group-hover:bg-slate-700 text-slate-400 group-hover:text-white font-mono text-xs flex items-center justify-center font-bold transition">
+                  ${letters[idx]}
+                </span>
+                <span class="flex-1">${opt}</span>
+              </button>
+            `).join('')}
+          </div>
+
+          <!-- Diagnostic Feedback Rationale Container -->
+          <div id="mcqRationale" class="hidden p-4 rounded-xl border text-xs sm:text-sm space-y-2 mt-4"></div>
+        </div>
+      `;
+    }
+
+    function handleMCQSelection(chosenIdx, cardId) {
+      const card = MASTER_QUESTIONS.find(q => q.id === cardId);
+      if (!card) return;
+
+      const container = document.getElementById('mcqOptionsContainer');
+      const allButtons = container.querySelectorAll('button');
+      allButtons.forEach(btn => btn.disabled = true);
+
+      const isCorrect = (chosenIdx === card.answer);
+      const chosenBtn = document.getElementById(`mcqOpt-${chosenIdx}`);
+      const correctBtn = document.getElementById(`mcqOpt-${card.answer}`);
+
+      if (isCorrect) {
+        chosenBtn.className = "p-3.5 rounded-xl border border-emerald-500/60 bg-emerald-500/15 text-left text-xs sm:text-sm text-emerald-200 font-medium flex items-center gap-3 animate-pulse-success";
+        playSound('success');
+        stats.audited++;
+        stats.correct++;
+        smartReviewQueue.delete(card.id);
+      } else {
+        chosenBtn.className = "p-3.5 rounded-xl border border-rose-500/60 bg-rose-500/15 text-left text-xs sm:text-sm text-rose-200 font-medium flex items-center gap-3";
+        correctBtn.className = "p-3.5 rounded-xl border border-emerald-500/60 bg-emerald-500/15 text-left text-xs sm:text-sm text-emerald-200 font-medium flex items-center gap-3";
+        playSound('error');
+        stats.audited++;
+        smartReviewQueue.add(card.id);
+      }
+
+      const rationaleBox = document.getElementById('mcqRationale');
+      rationaleBox.classList.remove('hidden');
+      rationaleBox.className = isCorrect 
+        ? "p-4 rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-200 text-xs sm:text-sm space-y-1.5"
+        : "p-4 rounded-xl border border-rose-500/30 bg-rose-500/10 text-rose-200 text-xs sm:text-sm space-y-1.5";
+
+      rationaleBox.innerHTML = `
+        <div class="font-bold flex items-center gap-1.5">
+          <span>${isCorrect ? '✓ Correct Diagnostic Analysis' : '✗ Incorrect Choice'}</span>
+        </div>
+        <p class="text-slate-300">${card.explanation}</p>
+      `;
+
+      updateUIHeaderBadges();
+      saveState();
+    }
+
+    function omitCurrentQuestion(cardId) {
+      omittedIds.add(cardId);
+      smartReviewQueue.delete(cardId);
+      saveState();
+      playSound('click');
+      rebuildActiveDeck();
+      renderActiveCard();
+    }
+
+    function restoreOmittedQuestion(cardId) {
+      omittedIds.delete(cardId);
+      saveState();
+      playSound('click');
+      rebuildActiveDeck();
+      renderOmittedList();
+      renderActiveCard();
+    }
+
+    function restoreAllOmitted() {
+      omittedIds.clear();
+      saveState();
+      playSound('success');
+      rebuildActiveDeck();
+      closeOmittedModal();
+      renderActiveCard();
+    }
+
+    function openOmittedModal() {
+      renderOmittedList();
+      document.getElementById('omittedModal').classList.remove('hidden');
+      playSound('click');
+    }
+
+    function closeOmittedModal() {
+      document.getElementById('omittedModal').classList.add('hidden');
+    }
+
+    function renderOmittedList() {
+      const container = document.getElementById('omittedItemsList');
+      if (omittedIds.size === 0) {
+        container.innerHTML = `
+          <div class="p-8 text-center text-slate-400 text-xs">
+            No questions currently omitted. All ${MASTER_QUESTIONS.length} questions are active.
+          </div>
+        `;
+        return;
+      }
+
+      const omittedArray = MASTER_QUESTIONS.filter(q => omittedIds.has(q.id));
+      container.innerHTML = omittedArray.map(q => `
+        <div class="p-3 bg-slate-950 rounded-xl border border-slate-800 flex items-center justify-between gap-3 text-xs">
+          <div>
+            <div class="font-bold text-white">${q.title}</div>
+            <div class="text-slate-400 text-[11px] font-mono">${q.categoryLabel}</div>
+          </div>
+          <button onclick="restoreOmittedQuestion('${q.id}')" class="px-2.5 py-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 text-[11px] font-medium transition">
+            Restore
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function openPrimerModal(cardId) {
+      const card = MASTER_QUESTIONS.find(q => q.id === cardId);
+      if (!card) return;
+
+      document.getElementById('primerModalTitle').innerText = card.title;
+      document.getElementById('primerModalContent').innerHTML = card.primerExcerpt || card.explanation;
+      document.getElementById('primerModal').classList.remove('hidden');
+      playSound('click');
+    }
+
+    function closePrimerModal() {
+      document.getElementById('primerModal').classList.add('hidden');
+    }
+
+    function renderPrimerMode() {
+      const container = document.getElementById('primerViewport');
+      container.innerHTML = `
+        <div class="space-y-6">
+          <div class="bg-gradient-to-r from-brand-600/20 to-indigo-600/20 border border-brand-500/30 rounded-2xl p-5 sm:p-6">
+            <h2 class="text-lg sm:text-xl font-bold text-white mb-2">📖 The Micro-Drama Screenwriting Primer Index</h2>
+            <p class="text-xs sm:text-sm text-slate-300">
+              Browse verbatim notes, checklists, and formulas. You can initiate a targeted rote drill directly from any section below.
+            </p>
+          </div>
+
+          <div class="space-y-4">
+            ${MASTER_QUESTIONS.map(q => `
+              <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+                <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-800">
+                  <div>
+                    <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-brand-300 font-mono uppercase font-bold tracking-wider">${q.categoryLabel}</span>
+                    <h3 class="text-base font-bold text-white mt-1">${q.title}</h3>
+                  </div>
+                  <button onclick="jumpToDrill('${q.id}')" class="px-3 py-1.5 rounded-xl bg-brand-600/30 hover:bg-brand-600 text-brand-200 hover:text-white border border-brand-500/40 text-xs font-semibold transition">
+                    Drill This Card ⚡
+                  </button>
+                </div>
+                <div class="text-xs sm:text-sm text-slate-300 leading-relaxed space-y-2">
+                  ${q.primerExcerpt || q.explanation}
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function jumpToDrill(cardId) {
+      setStudyMode('practice');
+      const idx = activeDeck.findIndex(q => q.id === cardId);
+      if (idx !== -1) {
+        currentDeckIndex = idx;
+        renderActiveCard();
+      }
+    }
+
+    function nextCard() {
+      if (currentDeckIndex < activeDeck.length - 1) {
+        currentDeckIndex++;
+        renderActiveCard();
+        playSound('click');
+        stabilizeCardScroll();
+      } else {
+        playSound('success');
+      }
+    }
+
+    function prevCard() {
+      if (currentDeckIndex > 0) {
+        currentDeckIndex--;
+        renderActiveCard();
+        playSound('click');
+        stabilizeCardScroll();
+      }
+    }
+
+    function updateUIHeaderBadges() {
+      // Omitted badge
+      const omittedBadge = document.getElementById('omittedCountBadge');
+      if (omittedBadge) omittedBadge.innerText = omittedIds.size;
+      const microOmittedBadge = document.getElementById('microOmittedBadge');
+      if (microOmittedBadge) microOmittedBadge.innerText = omittedIds.size;
+
+      // Smart review queue badge
+      const reviewBadge = document.getElementById('reviewQueueCount');
+      if (reviewBadge) {
+        if (smartReviewQueue.size > 0) {
+          reviewBadge.classList.remove('hidden');
+          reviewBadge.innerText = smartReviewQueue.size;
+        } else {
+          reviewBadge.classList.add('hidden');
+        }
+      }
+
+      // Accuracy stats badge
+      const rate = stats.audited === 0 ? 100 : Math.round((stats.correct / stats.audited) * 100);
+      const accuracyBadge = document.getElementById('accuracyBadge');
+      if (accuracyBadge) accuracyBadge.innerText = `${rate}%`;
+      const microAccuracyBadge = document.getElementById('microAccuracyBadge');
+      if (microAccuracyBadge) microAccuracyBadge.innerText = `${rate}%`;
+
+      // Micro card progress
+      const microCardProgress = document.getElementById('microCardProgress');
+      if (microCardProgress && activeDeck.length > 0) {
+        microCardProgress.innerText = `Card ${currentDeckIndex + 1}/${activeDeck.length}`;
+      }
+
+      const microModeBadge = document.getElementById('microModeBadge');
+      if (microModeBadge) {
+        const modeLabels = { practice: 'Practice', exam: 'Exam', review: 'Review', primer: 'Primer' };
+        microModeBadge.innerText = modeLabels[currentStudyMode] || 'Practice';
+      }
+
+      const microSoundIcon = document.getElementById('microSoundIcon');
+      if (microSoundIcon) {
+        microSoundIcon.innerText = soundEnabled ? '🔊' : '🔇';
+      }
+    }
+
+    function openStatsModal() {
+      document.getElementById('statTotalAnswered').innerText = stats.audited;
+      const rate = stats.audited === 0 ? 100 : Math.round((stats.correct / stats.audited) * 100);
+      document.getElementById('statMasteryRate').innerText = `${rate}%`;
+      document.getElementById('statReviewCount').innerText = smartReviewQueue.size;
+      document.getElementById('statOmittedCount').innerText = omittedIds.size;
+      document.getElementById('statsModal').classList.remove('hidden');
+      playSound('click');
+    }
+
+    function closeStatsModal() {
+      document.getElementById('statsModal').classList.add('hidden');
+    }
+
+    function resetAllStats() {
+      stats.audited = 0;
+      stats.correct = 0;
+      smartReviewQueue.clear();
+      saveState();
+      updateUIHeaderBadges();
+      closeStatsModal();
+      playSound('click');
+    }
+
+    function resetCategoryProgress() {
+      currentDeckIndex = 0;
+      rebuildActiveDeck();
+      renderActiveCard();
+      playSound('click');
+    }
+
+    document.addEventListener('keydown', (e) => {
+      // Modal escape close
+      if (e.key === 'Escape') {
+        closePrimerModal();
+        closeOmittedModal();
+        closeStatsModal();
+        return;
+      }
+
+      // Prevent key shortcuts while typing in input
+      if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') {
+        return;
+      }
+
+      // Next / Previous navigation
+      if (e.key === 'Enter') {
+        nextCard();
+      } else if (e.key === 'ArrowRight') {
+        nextCard();
+      } else if (e.key === 'ArrowLeft') {
+        prevCard();
+      } else if (e.key === ' ' && currentStudyMode === 'practice') {
+        const card = activeDeck[currentDeckIndex];
+        if (card && card.category === 'list' && listRecallMode === 'audit') {
+          e.preventDefault();
+          revealAuditView(card.id);
+        }
+      }
+    });
+
+    // Bootloader on window load
+    window.onload = function() {
+      loadState();
+      rebuildActiveDeck();
+      renderActiveCard();
+      updateUIHeaderBadges();
+
+      // Auto-enable Focus Mode on narrow mobile screens to prioritize study area
+      if (window.innerWidth < 640) {
+        toggleFocusMode();
+      }
+    };
+  </script>
+</body>
+</html>
